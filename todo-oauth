@@ -1,0 +1,259 @@
+[chatgtp]
+To jest bardzo dobra uwaga. I myślę, że wiem, gdzie jest problem.
+
+Ja próbowałem zrobić "łatwy do skanowania artykuł", a Ty nie chcesz artykułu. Ty chcesz rozdział z dobrej książki dla senior developera.
+
+Różnica jest ogromna.
+
+Ty nie chcesz przeczytać co to jest OAuth. Ty chcesz zrozumieć dlaczego świat skończył z OAuth zamiast z prostym API Key + tabelką w bazie.
+
+To jest zupełnie inny poziom.
+
+I myślę, że powinno to wyglądać mniej więcej tak:
+
+5-7 dużych rozdziałów.
+Każdy rozdział ma 2-5 stron tekstu (w sensie bardzo długi opis).
+Dopiero na końcu rozdziału ewentualnie jeden diagram ASCII albo flow.
+Prawie żadnych bulletów.
+Żadnego "tak/nie", "koniec", "i tyle".
+Pisane dla developera, który zna HTTP, REST, JWT, C#, bazy danych i chce zrozumieć decyzje architektoniczne.
+
+I przede wszystkim odpowiedzieć na pytania, których prawie nigdzie nie ma, np.:
+
+Dlaczego API Key przestał wystarczać dużym firmom?
+Dlaczego OAuth powstał, skoro można zrobić tabelę ApiKeys i Permissions?
+Dlaczego Google nie daje po prostu API Key?
+Dlaczego banki prawie nigdy nie używają API Key do partnerów?
+Dlaczego OAuth jest prawie zawsze połączony z JWT?
+Dlaczego JWT bez OAuth czasem jest świetnym rozwiązaniem?
+Dlaczego OAuth bez JWT też istnieje?
+Dlaczego większość startupów nie potrzebuje OAuth przez pierwsze kilka lat?
+Jak wygląda naturalna ewolucja systemu od jednego API do kilkudziesięciu mikroserwisów?
+Dlaczego własny endpoint /login jest świetny... aż pewnego dnia przestaje być?
+Co boli po 100 klientach? Po 1000? Po 10000?
+Dlaczego Azure AD, Keycloak i Auth0 w ogóle istnieją?
+Jakie problemy organizacyjne rozwiązują, których nie widać z perspektywy kodu?
+Dlaczego OAuth jest bardziej problemem organizacyjnym niż technicznym?
+
+I to wszystko oprzeć na jednym rozwijającym się przykładzie, zamiast wymyślać pięć różnych firm.
+
+[...]
+
+Natomiast z tym pytaniem:
+
+"czemu API Key + tabela w bazie nie wystarcza?"
+
+To jest dokładnie pytanie, od którego powinien zaczynać się cały artykuł, a nie pojawić się jako ciekawostka.
+
+Bo to jest sedno.
+
+Wyobraź sobie taką tabelę.
+
+ApiKeys
+--------
+Id
+Secret
+CompanyId
+IsActive
+ExpiresAt
+
+ApiKeyPermissions
+-----------------
+ApiKeyId
+Permission
+
+I teraz ktoś mówi:
+
+po co OAuth?
+
+Na pierwszy rzut oka... po nic.
+
+Serio.
+
+Da się na tym obsłużyć ogromną liczbę systemów.
+
+Więc cały rozdział powinien analizować, w którym dokładnie momencie ten model zaczyna się sypać.
+
+Nie dlatego, że OAuth jest "nowocześniejszy".
+
+Tylko dlatego, że pojawiają się problemy typu:
+
+delegowanie uprawnień,
+aplikacje działające w imieniu użytkownika,
+krótkotrwałe tokeny,
+rotacja sekretów bez przestojów,
+wiele typów klientów (browser, mobile, backend, partner),
+centralne zarządzanie tożsamością,
+federacja z zewnętrznymi IdP,
+zgody użytkownika (consent),
+audyt,
+separacja odpowiedzialności między zespołami.
+
+I wtedy okazuje się, że OAuth nie jest "lepszym API Key".
+
+OAuth jest odpowiedzią na zupełnie inne problemy, których w małym systemie jeszcze nie widać.
+
+Myślę, że taki materiał miałby około 25-40 stron A4. Krócej się tego po prostu dobrze nie da zrobić, jeśli celem jest zrozumienie architektury, a nie nauczenie się nazw protokołów. I szczerze mówiąc, taki materiał sam chciałbym przeczytać, bo większość książek zaczyna od RFC zamiast od pytania: "dlaczego ktokolwiek wymyślił ten cały bałagan?" To właśnie jest najciekawsze. A cała reszta jest już tylko konsekwencją.
+
+[...]
+Co jest najciekawsze?
+
+Moim zdaniem... nie OAuth.
+
+Najciekawsze jest:
+
+dlaczego poprzednie rozwiązanie przestało działać.
+
+Bo wtedy wszystko nagle ma sens.
+
+Przykład.
+
+Masz jedną aplikację.
+
+React
+
+↓
+
+.NET API
+
+↓
+
+SQL
+
+JWT.
+
+Idealnie.
+
+Nie potrzebujesz nic więcej.
+
+Potem pojawia się aplikacja mobilna.
+
+Nadal jest dobrze.
+
+Potem pojawia się partner.
+
+Nadal można to ogarnąć.
+
+Potem pojawia się drugi partner.
+
+Potem dziesiąty.
+
+Potem partner mówi:
+
+"chcę mieć osobne uprawnienia dla produkcji i testów."
+
+Robisz.
+
+Potem:
+
+"chcę dwa klucze jednocześnie, bo robię rotację."
+
+Robisz.
+
+Potem:
+
+"chcę ograniczyć tylko do /orders."
+
+Robisz.
+
+Potem:
+
+"ten klucz ma wygasać za godzinę."
+
+Robisz.
+
+Potem:
+
+"chcę wykonywać operacje w imieniu użytkownika."
+
+...
+
+I nagle patrzysz na kod.
+
+Masz już:
+
+ApiKeys
+Permissions
+Expiration
+Refresh
+Rotation
+Audit
+Revocation
+ClientTypes
+Scopes
+Consent
+AllowedOrigins
+
+I w tym momencie dociera do Ciebie brutalna prawda.
+
+Ty właśnie od pół roku piszesz własnego OAuth.
+
+To jest moment, którego dokumentacje prawie nigdy nie pokazują.
+
+[...]
+
+Myślę, że najlepszy materiał wyglądałby inaczej niż książka
+
+Nie alfabetycznie.
+
+Nie według protokołów.
+
+Tylko według ewolucji systemu.
+
+Na przykład jedna firma.
+
+Nazwijmy ją InvoiceCloud.
+
+I przez całą książkę obserwujesz tylko ją.
+
+Rozdział 1.
+
+1 API
+
+10 klientów
+
+Rozdział 2.
+
+5 API
+
+100 klientów
+
+Rozdział 3.
+
+Partnerzy
+
+Rozdział 4.
+
+Mobile
+
+Rozdział 5.
+
+Google Login
+
+Rozdział 6.
+
+Azure AD
+
+Rozdział 7.
+
+SSO
+
+Rozdział 8.
+
+Mikroserwisy
+
+Rozdział 9.
+
+10 zespołów developerskich
+
+Rozdział 10.
+
+100 milionów requestów dziennie.
+
+I na każdym etapie odpowiadasz na jedno pytanie:
+
+Dlaczego poprzednia architektura przestała wystarczać?
+
+Moim zdaniem to jest najlepszy sposób nauki architektury. Nie uczysz się technologii. Uczysz się presji, która zmusiła ludzi do jej wynalezienia.
+
+I szczerze mówiąc, to jest materiał, który da się napisać. Tylko nie w jednej odpowiedzi. To jest raczej seria rozdziałów z utrzymywaną ciągłością, gdzie każdy kolejny rozdział wynika z poprzedniego. Wtedy zamiast zapamiętywać akronimy, zaczynasz rozumieć, dlaczego w ogóle istnieją. To jest różnica między kimś, kto umie skonfigurować bibliotekę OAuth, a kimś, kto potrafi zdecydować, czy w danym projekcie OAuth jest potrzebny, czy jest po prostu drogim hobby architekta, który od tygodnia nie napisał ani jednej linijki kodu biznesowego.
